@@ -49,10 +49,10 @@
 (eval-and-compile
   (defconst nextflow-rx-constituents
     `((nf-type . ,(rx (and (group symbol-start
-                             (or "process" "file" "val" "Channel")
-                             " "
-                             (group (one-or-more
-                                      (or (syntax word) (syntax symbol)))))))
+                             (or "process" "file" "val" "Channel"))
+                        " "
+                        (group (one-or-more
+                                 (or (syntax word) (syntax symbol)))))))
        (anon-process . ,(rx symbol-start "process"))
        (nf-directive . ,(rx symbol-start
                           (or "afterScript"
@@ -100,8 +100,8 @@
                           "launchDir")
                         symbol-end))
        (nf-constant . ,(rx symbol-start
-                        (or "null")
-                        symbol-end))))
+                         (or "null")
+                         symbol-end)))
     "Nextflow-specific sexps for `nextflow-rx'.")
 
   (defmacro nextflow-rx (&rest regexps)
@@ -109,12 +109,16 @@
     ;; Modified from `groovy-rx'.
     (let ((rx-constituents (append nextflow-rx-constituents rx-constituents)))
       (cond ((null regexps)
-             (error "No regexp"))
-            ((cdr regexps)
-             (rx-to-string `(and ,@regexps) t))
-            (t
-             (rx-to-string (car regexps) t))))))
+              (error "No regexp"))
+        ((cdr regexps)
+          (rx-to-string `(and ,@regexps) t))
+        (t
+          (rx-to-string (car regexps) t))))))
 
+(defconst nextflow-process-re
+  (nextflow-rx line-start (zero-or-more space)
+    (or nf-type (group anon-process)))
+  "Regexp matching a rule or subworkflow.")
 
 ;;; Mode
 
