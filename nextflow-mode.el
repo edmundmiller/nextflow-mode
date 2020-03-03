@@ -123,19 +123,19 @@
 ;;; Mode
 
 (defvar nextflow--font-lock-keywords
-    `((,nextflow-rule-or-subworkflow-re
-       (1 font-lock-keyword-face nil 'lax)
-       (2 font-lock-function-name-face nil 'lax)
-       (3 font-lock-keyword-face nil 'lax))
+  `((,nextflow-process-re
+      (1 font-lock-keyword-face nil 'lax)
+      (2 font-lock-function-name-face nil 'lax)
+      (3 font-lock-keyword-face nil 'lax)
       (,(nextflow-rx line-start (one-or-more space)
-                      (group field-key)
-                      (zero-or-more space) ":")
-       1 font-lock-type-face)
+          (group nf-block)
+          (zero-or-more space) ":")
+        1 font-lock-function-name-face)
       (,(nextflow-rx line-start (zero-or-more space)
-                      (group sm-command)
-                      (zero-or-more space) ":")
-       1 font-lock-keyword-face)
-      (,(nextflow-rx (group sm-builtin)) 1 font-lock-builtin-face)))
+          (group nf-directive)
+          (one-or-more space) "'")
+        1 font-lock-keyword-face)
+      (,(nextflow-rx (group nf-type)) 1 font-lock-type-face))))
 
 (if (bound-and-true-p groovy-font-lock-keywords-level-1)
     (with-no-warnings
