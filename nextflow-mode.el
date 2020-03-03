@@ -48,52 +48,60 @@
 
 (eval-and-compile
   (defconst nextflow-rx-constituents
-    `((named-rule . ,(rx (and (group symbol-start
-                                     (or "checkpoint" "rule" "subworkflow"))
-                              " "
-                              (group (one-or-more
+    `((nf-type . ,(rx (and (group symbol-start
+                             (or "process" "file" "val" "Channel")
+                             " "
+                             (group (one-or-more
                                       (or (syntax word) (syntax symbol)))))))
-      (anon-rule . ,(rx symbol-start "rule"))
-      (block-key . ,(rx symbol-start
-                        (or "input"
-                            "output"
-                            "script"
-                            "shell"
-                            "exec")
+       (anon-process . ,(rx symbol-start "process"))
+       (nf-directive . ,(rx symbol-start
+                          (or "afterScript"
+                            "beforeScript"
+                            "cache"
+                            "container"
+                            "cpus"
+                            "clusterOptions"
+                            "disk"
+                            "echo"
+                            "errorStrategy"
+                            "executor"
+                            "ext"
+                            "label"
+                            "maxErrors"
+                            "maxForks"
+                            "maxRetries"
+                            "memory"
+                            "module"
+                            "penv"
+                            "publishDir"
+                            "queue"
+                            "scratch"
+                            "storeDir"
+                            "stageInMode"
+                            "stageOutMode"
+                            "tag"
+                            "time"
+                            "validExitStatus")
+                          symbol-end))
+       (nf-block . ,(rx symbol-start
+                      (or "input"
+                        "output"
+                        "script"
+                        "shell"
+                        "exec")
+                      symbol-end))
+       (nf-keyword . ,(rx symbol-start
+                        (or "from"
+                          "into")
                         symbol-end))
-      (sm-command . ,(rx symbol-start
-                         (or "configfile"
-                             "include"
-                             "localrules"
-                             "onerror"
-                             "onsuccess"
-                             "report"
-                             "ruleorder"
-                             "singularity"
-                             "wildcard_constraints"
-                             "workdir")
-                         symbol-end))
-      (sm-builtin . ,(rx symbol-start
-                         (or "ancient"
-                             "checkpoints"
-                             "directory"
-                             "dynamic"
-                             "expand"
-                             "input"
-                             "multiext"
-                             "output"
-                             "params"
-                             "pipe"
-                             "protected"
-                             "report"
-                             "shell"
-                             "temp"
-                             "touch"
-                             "unpack"
-                             "wildcards")
-                         symbol-end))
-      ;; Deprecated.  Use `sm-builtin' instead.
-      (sm-func . sm-builtin))
+       (nf-special . ,(rx symbol-start
+                        (or "workflow"
+                          "params"
+                          "launchDir")
+                        symbol-end))
+       (nf-constant . ,(rx symbol-start
+                        (or "null")
+                        symbol-end))))
     "Nextflow-specific sexps for `nextflow-rx'.")
 
   (defmacro nextflow-rx (&rest regexps)
