@@ -159,19 +159,26 @@
   (defvar nextflow-font-lock-keywords
     (append nextflow--font-lock-keywords groovy-font-lock-keywords)))
 
-(defun nextflow-indent-syntax-ppss (orig-fun &rest args)
+(defun nextflow--indent-syntax-ppss (orig-fun &rest args)
   (let ((syntax-bol (apply orig-fun args)))
             (setf (nth 3 syntax-bol) nil)
             syntax-bol))
+
+(defun nextflow--ends-with-infix-p (orig-fun str)
+  (or (funcall orig-fun str)
+      (groovy--ends-with-token-p '("\\") str)))
 
 (defun nextflow-indent-line ()
   "Indent the current line according to the number of parentheses."
   (interactive)
   (unwind-protect
       (progn
-        (advice-add 'syntax-ppss :around 'nextflow-indent-syntax-ppss)
+        (advice-add 'syntax-ppss :around 'nextflow--indent-syntax-ppss)
+        (advice-add 'groovy--ends-with-infix-p :around 'nextflow--ends-with-infix-p)
         (groovy-indent-line))
-    (advice-remove 'syntax-ppss 'nextflow-indent-syntax-ppss)))
+    (progn
+      (advice-remove 'syntax-ppss 'nextflow--indent-syntax-ppss)
+      (advice-remove 'groovy--ends-with-infix-p 'nextflow--ends-with-infix-p))))
 
 ;;;###autoload
 (define-derived-mode nextflow-mode groovy-mode "Nextflow"
