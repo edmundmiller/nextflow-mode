@@ -49,7 +49,11 @@
 (eval-and-compile
   (defconst nextflow-rx-constituents
     `((nf-type . ,(rx (and (group symbol-start
-                                  (or "process" "file" "val" "Channel"))
+                                  (or "process"
+                                      "file"
+                                      "val"
+                                      "Channel"
+                                      "workflow"))
                            " "
                            (group (one-or-more
                                    (or (syntax word) (syntax symbol)))))))
@@ -95,8 +99,7 @@
                              "into")
                          symbol-end))
       (nf-special . ,(rx symbol-start
-                         (or "workflow"
-                             "params"
+                         (or "params"
                              "launchDir")
                          symbol-end))
       (nf-constant . ,(rx symbol-start
