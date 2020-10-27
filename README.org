@@ -1,0 +1,12 @@
+#+TITLE: Emacs Nextflow Mode
+
+This is a basic mode for syntax highlighting for [[https://www.nextflow.io/][Nextflow]] based on [[https://git.kyleam.com/snakemake-mode/about/][snakemake-mode]]. More features such as a popup runner, and better script editing planned in the future! Support for DSL2 is in the works also.
+
+** Installation
+
+This package is currently not on melpa yet. If you're using [[https://github.com/hlissner/doom-emacs][Doom Emacs]] you can
+use this snippet to install the package.
+
+#+BEGIN_SRC emacs-lisp
+(package! nextflow-mode :recipe (:host github :repo "emiller88/nextflow-mode"))
+#+END_SRC
