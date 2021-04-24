@@ -109,7 +109,6 @@
 
   (defmacro nextflow-rx (&rest regexps)
     "Specialized `rx' for Nextflow mode."
-    ;; Modified from `groovy-rx'.
     (let ((rx-constituents (append nextflow-rx-constituents rx-constituents)))
       (cond ((null regexps)
              (error "No regexp"))
@@ -118,15 +117,15 @@
             (t
              (rx-to-string (car regexps) t))))))
 
-(defconst nextflow-process-re
+(defconst nextflow-process-or-workflow-re
   (nextflow-rx line-start (zero-or-more space)
-               (or nf-type (group anon-process)))
+               (or nf-type anon-process))
   "Regexp matching a rule or subworkflow.")
 
 ;;; Mode
 
 (defvar nextflow--font-lock-keywords
-  `((,nextflow-process-re
+  `((,nextflow-process-or-workflow-re
      (1 font-lock-keyword-face nil 'lax)
      (2 font-lock-function-name-face nil 'lax)
      (3 font-lock-keyword-face nil 'lax)
