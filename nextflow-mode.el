@@ -122,6 +122,28 @@
                (or nf-type anon-process))
   "Regexp matching a rule or subworkflow.")
 
+
+;;; Imenu
+
+(defun nextflow-imenu-create-index ()
+  "Create Imenu index for rule blocks.
+If `python-imenu-create-index' returns a non-nil value, also
+include these results and append a \"(rule)\" to the index
+label."
+  (let ((nf-index (nextflow--imenu-build-rule-index)))
+      nf-index))
+
+(defun nextflow--imenu-build-rule-index ()
+  (goto-char (point-min))
+  (let (index)
+    (while (re-search-forward nextflow-process-or-workflow-re nil t)
+      (push (cons (match-string-no-properties 2)
+                  (save-excursion (beginning-of-line)
+                                  (point-marker)))
+            index))
+    (nreverse index)))
+
+
 ;;; Mode
 
 (defvar nextflow--font-lock-keywords
@@ -185,6 +207,8 @@
 ;;;###autoload
 (define-derived-mode nextflow-mode groovy-mode "Nextflow"
   "Mode for editing Nextflow files."
+  (set (make-local-variable 'imenu-create-index-function)
+       #'nextflow-imenu-create-index)
   (set (make-local-variable 'font-lock-defaults)
        (cons nextflow-font-lock-keywords (cdr font-lock-defaults)))
   (set (make-local-variable 'indent-line-function) #'nextflow-indent-line))
