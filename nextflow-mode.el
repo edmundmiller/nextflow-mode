@@ -95,6 +95,11 @@
                            "shell"
                            "exec")
                        symbol-end))
+      (nf-workflow-body . ,(rx symbol-start
+                               (or "take"
+                                   "main"
+                                   "emit")
+                               symbol-end))
       (nf-keyword . ,(rx symbol-start
                          (or "from"
                              "into")
