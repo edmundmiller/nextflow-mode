@@ -132,7 +132,7 @@ If `python-imenu-create-index' returns a non-nil value, also
 include these results and append a \"(rule)\" to the index
 label."
   (let ((nf-index (nextflow--imenu-build-rule-index)))
-      nf-index))
+    nf-index))
 
 (defun nextflow--imenu-build-rule-index ()
   (goto-char (point-min))
