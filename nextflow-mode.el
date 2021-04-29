@@ -90,6 +90,7 @@
       (nf-block . ,(rx symbol-start
                        (or "input"
                            "output"
+                           "when"
                            "script"
                            "shell"
                            "exec")
