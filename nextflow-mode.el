@@ -128,21 +128,23 @@
                (or nf-type anon-process))
   "Regexp matching a rule or subworkflow.")
 
+(defconst nextflow-imenu-re
+  (nextflow-rx line-start (zero-or-more space)
+               (or nf-type anon-process nf-block nf-workflow-body))
+  "Regexp matching something that should go in imenu.")
+
 
 ;;; Imenu
 
 (defun nextflow-imenu-create-index ()
-  "Create Imenu index for rule blocks.
-If `python-imenu-create-index' returns a non-nil value, also
-include these results and append a \"(rule)\" to the index
-label."
+  "Create Imenu index for processes and workflow blocks."
   (let ((nf-index (nextflow--imenu-build-rule-index)))
     nf-index))
 
 (defun nextflow--imenu-build-rule-index ()
   (goto-char (point-min))
   (let (index)
-    (while (re-search-forward nextflow-process-or-workflow-re nil t)
+    (while (re-search-forward nextflow-imenu-re nil t)
       (push (cons (match-string-no-properties 2)
                   (save-excursion (beginning-of-line)
                                   (point-marker)))
