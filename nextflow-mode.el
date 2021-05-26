@@ -227,6 +227,8 @@
 (add-to-list 'auto-mode-alist '("\\.nf\\'" . nextflow-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.nextflow\\'" . nextflow-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\nextflow.config\\'" . nextflow-mode))
 
 (provide 'nextflow-mode)
 ;;; nextflow-mode.el ends here
