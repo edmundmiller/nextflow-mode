@@ -57,7 +57,7 @@
                            " "
                            (group (one-or-more
                                    (or (syntax word) (syntax symbol)))))))
-      (anon-process . ,(rx symbol-start "process"))
+      (anon-workflow . ,(rx symbol-start "workflow"))
       (nf-directive . ,(rx symbol-start
                            (or "afterScript"
                                "beforeScript"
@@ -125,12 +125,12 @@
 
 (defconst nextflow-process-or-workflow-re
   (nextflow-rx line-start (zero-or-more space)
-               (or nf-type anon-process))
+               (or nf-type anon-workflow))
   "Regexp matching a rule or subworkflow.")
 
 (defconst nextflow-imenu-re
   (nextflow-rx line-start (zero-or-more space)
-               (or nf-type anon-process nf-block nf-workflow-body))
+               (or nf-type anon-workflow nf-block nf-workflow-body))
   "Regexp matching something that should go in imenu.")
 
 
@@ -161,7 +161,7 @@
      (3 font-lock-keyword-face nil 'lax)
      (,(nextflow-rx line-start (one-or-more space)
                     (group nf-block)
-                    (zero-or-more space) ":")
+                    (zero-or-more space) "(")
       1 font-lock-function-name-face)
      (,(nextflow-rx line-start (zero-or-more space)
                     (group nf-directive)
