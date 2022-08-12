@@ -21,6 +21,8 @@
 ;;; Code:
 
 
+
+
 (require 'cl-lib)
 (require 'groovy-mode)
 
@@ -50,67 +52,94 @@
 (eval-and-compile
   (defconst nextflow-rx-constituents
     `((nf-type . ,(rx (and (group symbol-start
-                                  (or "process"
+                                  (or "val"
+                                      "env"
                                       "file"
-                                      "val"
-                                      "Channel"
-                                      "workflow"))
-                           " "
-                           (group (one-or-more
-                                   (or (syntax word) (syntax symbol)))))))
-      (anon-workflow . ,(rx symbol-start "workflow"))
-      (nf-directive . ,(rx symbol-start
-                           (or "afterScript"
-                               "beforeScript"
-                               "cache"
-                               "container"
-                               "cpus"
-                               "clusterOptions"
-                               "disk"
-                               "echo"
-                               "errorStrategy"
-                               "executor"
-                               "ext"
-                               "label"
-                               "maxErrors"
-                               "maxForks"
-                               "maxRetries"
-                               "memory"
-                               "module"
-                               "penv"
-                               "publishDir"
-                               "queue"
-                               "scratch"
-                               "storeDir"
-                               "stageInMode"
-                               "stageOutMode"
-                               "tag"
-                               "time"
-                               "validExitStatus")
+                                      "path"
+                                      "stdin"
+                                      "tuple"
+                                      "each"
+                                      "stdout"
+                                      "Channel"))
+                           symbol-end
+                           (zero-or-one (and " "
+                                             (one-or-more
+                                              (or (syntax word) (syntax symbol))) ":"))
+                           (zero-or-one (and " "
+                                             (group (one-or-more
+                                                     (or (syntax word) (syntax symbol)))))))))
+      (nf-function . ,(rx (and (group symbol-start
+                                      (or "process"
+                                          "workflow"))
+                               symbol-end
+                               (zero-or-one (and " "
+                                                 (group (one-or-more
+                                                         (or (syntax word) (syntax symbol)))))))))
+      (nf-keyword . ,(rx (group symbol-start
+                                (or "from"
+                                    "into"
+                                    "emit"
+                                    "include"))
+                         symbol-end))
+      (nf-directive . ,(rx (group symbol-start
+                                  (or "accelerator"
+                                      "afterScript"
+                                      "beforeScript"
+                                      "cache"
+                                      "clusterOptions"
+                                      "conda"
+                                      "container"
+                                      "containerOptions"
+                                      "cpus"
+                                      "debug"
+                                      "disk"
+                                      "echo"
+                                      "errorStrategy"
+                                      "executor"
+                                      "ext"
+                                      "label"
+                                      "machineType"
+                                      "maxErrors"
+                                      "maxForks"
+                                      "maxRetries"
+                                      "memory"
+                                      "module"
+                                      "penv"
+                                      "pod"
+                                      "publishDir"
+                                      "queue"
+                                      "scratch"
+                                      "stageInMode"
+                                      "stageOutMode"
+                                      "storeDir"
+                                      "tag"
+                                      "time"))
                            symbol-end))
-      (nf-block . ,(rx symbol-start
-                       (or "input"
-                           "output"
-                           "when"
-                           "script"
-                           "shell"
-                           "exec")
+      (nf-block . ,(rx (group symbol-start
+                              (or "input"
+                                  "output"
+                                  "when"
+                                  "script"
+                                  "shell"
+                                  "exec"))
                        symbol-end))
-      (nf-workflow-body . ,(rx symbol-start
-                               (or "take"
-                                   "main"
-                                   "emit")
+      (nf-workflow-body . ,(rx (group symbol-start
+                                      (or "take"
+                                          "main"
+                                          "emit"))
                                symbol-end))
-      (nf-keyword . ,(rx symbol-start
-                         (or "from"
-                             "into")
+      (nf-special . ,(rx (group symbol-start
+                                (or "baseDir"
+                                    "launchDir"
+                                    "moduleDir"
+                                    "nextflow"
+                                    "params"
+                                    "projectDir"
+                                    "workDir"
+                                    "workflow"))
                          symbol-end))
-      (nf-special . ,(rx symbol-start
-                         (or "params"
-                             "launchDir")
-                         symbol-end))
-      (nf-constant . ,(rx symbol-start
-                          (or "null")
+      (nf-constant . ,(rx (group symbol-start
+                                 (or "null"))
                           symbol-end)))
     "Nextflow-specific sexps for `nextflow-rx'.")
 
@@ -124,14 +153,9 @@
             (t
              (rx-to-string (car regexps) t))))))
 
-(defconst nextflow-process-or-workflow-re
-  (nextflow-rx line-start (zero-or-more space)
-               (or nf-type anon-workflow))
-  "Regexp matching a rule or subworkflow.")
-
 (defconst nextflow-imenu-re
   (nextflow-rx line-start (zero-or-more space)
-               (or nf-type anon-workflow nf-block nf-workflow-body))
+               (or nf-type nf-function nf-keyword nf-block nf-workflow-body))
   "Regexp matching something that should go in imenu.")
 
 
@@ -156,19 +180,24 @@
 ;;; Mode
 
 (defvar nextflow--font-lock-keywords
-  `((,nextflow-process-or-workflow-re
+  `((,(nextflow-rx line-start (zero-or-more space) nf-function)
      (1 font-lock-keyword-face nil 'lax)
-     (2 font-lock-function-name-face nil 'lax)
-     (3 font-lock-keyword-face nil 'lax)
-     (,(nextflow-rx line-start (one-or-more space)
-                    (group nf-block)
-                    (zero-or-more space) "(")
-      1 font-lock-function-name-face)
-     (,(nextflow-rx line-start (zero-or-more space)
-                    (group nf-directive)
-                    (one-or-more space) "'")
-      1 font-lock-keyword-face)
-     (,(nextflow-rx (group nf-type)) 1 font-lock-type-face))))
+     (2 font-lock-function-name-face nil 'lax))
+    (,(nextflow-rx line-start (one-or-more space) nf-type)
+     (1 font-lock-type-face nil 'lax)
+     (2 font-lock-variable-name-face nil 'lax))
+    (,(nextflow-rx line-start (one-or-more space) nf-block
+                   (zero-or-more space) ":")
+     1 font-lock-keyword-face)
+    (,(nextflow-rx line-start (one-or-more space) nf-workflow-body
+                   (zero-or-more space) ":")
+     1 font-lock-keyword-face)
+    (,(nextflow-rx line-start (one-or-more space) nf-directive)
+     1 font-lock-builtin-face)
+    (,(nextflow-rx nf-special)
+     1 font-lock-builtin-face)
+    (,(nextflow-rx nf-keyword)
+     1 font-lock-keyword-face)))
 
 (if (bound-and-true-p groovy-font-lock-keywords-level-1)
     (with-no-warnings
