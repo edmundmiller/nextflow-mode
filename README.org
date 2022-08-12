@@ -3,6 +3,10 @@
 This is a basic mode for syntax highlighting for [[https://www.nextflow.io/][Nextflow]] based on [[https://git.kyleam.com/snakemake-mode/about/][snakemake-mode]]. More features such as a popup runner, and better script editing planned in the future! Support for DSL2 is in the works also.
 
 ** Installation
+In order to use this package you'll need to install this packages first:
+    - [[https://elpa.gnu.org/packages/cl-lib.html][cl-lib]] 
+    - [[https://melpa.org/#/groovy-mode][groovy-mode]]
+
 
 This package is currently not on melpa yet. If you're using [[https://github.com/hlissner/doom-emacs][Doom Emacs]] you can
 use this snippet to install the package.
