@@ -9,11 +9,12 @@
 ;; Version: 0.0.1
 ;; Keywords: tools nextflow bioinformatics
 ;; Homepage: https://github.com/emiller88/nextflow-mode
-;; Package-Requires: ((emacs "24.5") (cl-lib "0.5") (magit-popup "2.4.0"))
+;; Package-Requires: ((emacs "24.5") (magit-popup "2.4.0"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
+;; This package provides syntax highlighting for Nextflow files.
 ;;
 ;;
 ;;
