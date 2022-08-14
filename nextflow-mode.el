@@ -9,7 +9,7 @@
 ;; Version: 0.0.1
 ;; Keywords: tools nextflow bioinformatics
 ;; Homepage: https://github.com/emiller88/nextflow-mode
-;; Package-Requires: ((emacs "24.5") (magit-popup "2.4.0"))
+;; Package-Requires: ((emacs "24.5") (groovy-mode "2.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
