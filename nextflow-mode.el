@@ -54,6 +54,7 @@
     `((nf-type . ,(rx (and (group symbol-start
                                   (or "val"
                                       "env"
+                                      "eval"
                                       "file"
                                       "path"
                                       "stdin"
