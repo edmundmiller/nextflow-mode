@@ -5,7 +5,7 @@
 ;; Author: Edmund Miller <http://github/emiller88>
 ;; Maintainer: Edmund Miller <Edmund.A.Miller@gmail.com>
 ;; Created: February 28, 2020
-;; Modified: February 28, 2020
+;; Modified: December 26, 2024
 ;; Version: 0.0.1
 ;; Keywords: tools nextflow bioinformatics
 ;; Homepage: https://github.com/emiller88/nextflow-mode
@@ -14,12 +14,17 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
-;; This package provides syntax highlighting for Nextflow files.
+;; This package provides syntax highlighting and indentation support for Nextflow files.
+;; Nextflow is a reactive workflow framework and domain-specific language (DSL)
+;; for writing data-driven computational pipelines.
 ;;
-;;
+;; Features:
+;; - Syntax highlighting for Nextflow keywords, directives and blocks
+;; - Proper indentation handling
+;; - Imenu integration for quick navigation
+;; - Inherits from groovy-mode for base language support
 ;;
 ;;; Code:
-
 
 
 
@@ -31,20 +36,24 @@
 
 ;;;###autoload
 (defgroup nextflow-mode nil
-  "Support for Nextflow files"
-  :group 'tools)
+  "Support for Nextflow files."
+  :group 'tools
+  :prefix "nextflow-")
 
 (defcustom nextflow-mode-hook nil
   "Hook run when entering `nextflow-mode'."
-  :type 'hook)
+  :type 'hook
+  :group 'nextflow-mode)
 
 (defcustom nextflow-indent-field-offset 4
-  "Offset for field indentation."
-  :type 'integer)
+  "Offset for field indentation in Nextflow blocks."
+  :type 'integer
+  :group 'nextflow-mode)
 
 (defcustom nextflow-indent-value-offset 4
-  "Offset for field values that the line below the field key."
-  :type 'integer)
+  "Offset for field values that appear on the line below the field key."
+  :type 'integer
+  :group 'nextflow-mode)
 
 
 ;;; Regexp
@@ -163,11 +172,13 @@
 ;;; Imenu
 
 (defun nextflow-imenu-create-index ()
-  "Create Imenu index for processes and workflow blocks."
+  "Create Imenu index for Nextflow processes and workflow blocks.
+Returns an alist of name and position pairs for imenu navigation."
   (let ((nf-index (nextflow--imenu-build-rule-index)))
     nf-index))
 
 (defun nextflow--imenu-build-rule-index ()
+  "Build the raw index of rule names and positions."
   (goto-char (point-min))
   (let (index)
     (while (re-search-forward nextflow-imenu-re nil t)
