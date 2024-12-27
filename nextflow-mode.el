@@ -105,8 +105,17 @@
                                     "as"
                                     "in"
                                     "instanceof"
-                                    "new"))
+                                    "new"
+                                    "view"
+                                    "set"
+                                    "branch"))
                          symbol-end))
+      (nf-operator . ,(rx (group (or "=~" "==~" "!~" 
+                                     "|" "||"
+                                     ".&" ".flatten" ".collect"
+                                     ".mix" ".dump" ".view"
+                                     ".set" ".into" ".map" ".filter"))))
+      (nf-interpolation . ,(rx (group "${" (one-or-more (not "}")) "}")))
       (nf-directive . ,(rx (group symbol-start
                                   (or "accelerator"
                                       "afterScript"
@@ -226,11 +235,15 @@ Returns an alist of name and position pairs for imenu navigation."
                    (zero-or-more space) ":")
      1 font-lock-keyword-face)
     (,(nextflow-rx line-start (one-or-more space) nf-directive)
-     1 font-lock-builtin-face)
+     1 font-lock-preprocessor-face)
     (,(nextflow-rx nf-special)
      1 font-lock-builtin-face)
     (,(nextflow-rx nf-keyword)
-     1 font-lock-keyword-face)))
+     1 font-lock-keyword-face)
+    (,(nextflow-rx nf-operator)
+     1 font-lock-builtin-face)
+    (,(nextflow-rx nf-interpolation)
+     1 font-lock-variable-name-face)))
 
 (if (bound-and-true-p groovy-font-lock-keywords-level-1)
     (with-no-warnings
