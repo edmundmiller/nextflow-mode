@@ -70,7 +70,10 @@
                                       "tuple"
                                       "each"
                                       "stdout"
-                                      "Channel"))
+                                      "Channel"
+                                      "Date"
+                                      "Map"
+                                      "List"))
                            symbol-end
                            (zero-or-one (and " "
                                              (one-or-more
@@ -80,7 +83,8 @@
                                                      (or (syntax word) (syntax symbol)))))))))
       (nf-function . ,(rx (and (group symbol-start
                                       (or "process"
-                                          "workflow"))
+                                          "workflow"
+                                          "function"))
                                symbol-end
                                (zero-or-one (and " "
                                                  (group (one-or-more
@@ -89,7 +93,19 @@
                                 (or "from"
                                     "into"
                                     "emit"
-                                    "include"))
+                                    "include"
+                                    "take"
+                                    "main"
+                                    "publish"
+                                    "return"
+                                    "throw"
+                                    "try"
+                                    "catch"
+                                    "finally"
+                                    "as"
+                                    "in"
+                                    "instanceof"
+                                    "new"))
                          symbol-end))
       (nf-directive . ,(rx (group symbol-start
                                   (or "accelerator"
@@ -131,7 +147,9 @@
                                   "when"
                                   "script"
                                   "shell"
-                                  "exec"))
+                                  "exec"
+                                  "stub"
+                                  "directives"))
                        symbol-end))
       (nf-workflow-body . ,(rx (group symbol-start
                                       (or "take"
@@ -146,7 +164,10 @@
                                     "params"
                                     "projectDir"
                                     "workDir"
-                                    "workflow"))
+                                    "workflow"
+                                    "it"
+                                    "true"
+                                    "false"))
                          symbol-end))
       (nf-constant . ,(rx (group symbol-start
                                  (or "null"))
