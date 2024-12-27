@@ -35,7 +35,7 @@
 ;;; Customization
 
 ;;;###autoload
-(defgroup nextflow-mode nil
+(defgroup nextflow nil
   "Support for Nextflow files."
   :group 'tools
   :prefix "nextflow-")
@@ -43,17 +43,17 @@
 (defcustom nextflow-mode-hook nil
   "Hook run when entering `nextflow-mode'."
   :type 'hook
-  :group 'nextflow-mode)
+  :group 'nextflow)
 
 (defcustom nextflow-indent-field-offset 4
   "Offset for field indentation in Nextflow blocks."
   :type 'integer
-  :group 'nextflow-mode)
+  :group 'nextflow)
 
 (defcustom nextflow-indent-value-offset 4
   "Offset for field values that appear on the line below the field key."
   :type 'integer
-  :group 'nextflow-mode)
+  :group 'nextflow)
 
 
 ;;; Regexp
