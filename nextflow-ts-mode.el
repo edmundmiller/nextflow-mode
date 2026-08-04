@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'treesit)
+(require 'cl-lib)
 
 (declare-function treesit-parser-create "treesit.c")
 (declare-function treesit-node-child-by-field-name "treesit.c")
@@ -195,6 +196,45 @@
      (catch-all parent-bol 0)))
   "Tree-sitter indent rules for `nextflow-ts-mode'.")
 
+;;; Bash injection
+
+(defvar nextflow-ts-mode--range-settings
+  (when (treesit-available-p)
+    (treesit-range-rules
+     :embed 'bash
+     :host 'nextflow
+     ;; Capture only the string *content*, not the quote delimiters,
+     ;; otherwise bash parses the surrounding quotes as a string.
+     '((script_content
+        (interpolated_triple_quoted_string
+         (triple_string_content) @capture)))))
+  "Tree-sitter range rules injecting bash into process script blocks.")
+
+(defun nextflow-ts-mode--language-at-point (point)
+  "Return the treesit language at POINT: `bash' in injected script content."
+  (let ((node (treesit-node-at point 'nextflow)))
+    ;; Only triple-quoted script bodies are injected (must mirror
+    ;; `nextflow-ts-mode--range-settings').
+    (if (and node
+             (equal (treesit-node-type node) "triple_string_content")
+             (treesit-parent-until
+              node
+              (lambda (n)
+                (equal (treesit-node-type n) "script_content"))))
+        'bash
+      'nextflow)))
+
+(defun nextflow-ts-mode--bash-font-lock-settings ()
+  "Return bash tree-sitter font-lock settings from `sh-script'.
+Used to fontify embedded bash in process script blocks.  The
+settings are marked as overriding so they win over the host
+string face."
+  (require 'sh-script)
+  (when (boundp 'sh-mode--treesit-settings)
+    (mapcar (lambda (setting)
+              (list (nth 0 setting) (nth 1 setting) (nth 2 setting) t))
+            sh-mode--treesit-settings)))
+
 ;;; Navigation and imenu
 
 (defun nextflow-ts-mode--defun-name (node)
@@ -213,6 +253,12 @@
   "Major mode for editing Nextflow files, using tree-sitter."
   :group 'nextflow-ts
   (when (treesit-ready-p 'nextflow)
+    ;; Create the bash parser (used for script-block injection) first:
+    ;; `treesit-parser-list' is newest-first and generic treesit
+    ;; functions take the head as the buffer's main parser, so the
+    ;; nextflow parser must be created last.
+    (when (treesit-ready-p 'bash t)
+      (treesit-parser-create 'bash))
     (treesit-parser-create 'nextflow)
 
     ;; Comments.
@@ -231,6 +277,26 @@
 
     ;; Indentation.
     (setq-local treesit-simple-indent-rules nextflow-ts-mode--indent-rules)
+
+    ;; Bash injection into script blocks (requires the bash grammar).
+    (when (treesit-ready-p 'bash t)
+      (setq-local treesit-range-settings nextflow-ts-mode--range-settings)
+      (setq-local treesit-language-at-point-function
+                  #'nextflow-ts-mode--language-at-point)
+      (setq-local treesit-font-lock-settings
+                  (append treesit-font-lock-settings
+                          (nextflow-ts-mode--bash-font-lock-settings)))
+      ;; Enable the bash features sh-script defines at their usual levels.
+      (setq-local treesit-font-lock-feature-list
+                  (cl-loop for ours in treesit-font-lock-feature-list
+                           for extra in '((comment function)
+                                          (command declaration-command keyword
+                                           string string-interpolation heredoc)
+                                          (builtin-variable constant number
+                                           variable)
+                                          (bracket delimiter misc-punctuation
+                                           operator))
+                           collect (delete-dups (append ours extra)))))
     (setq-local indent-tabs-mode nil)
 
     ;; Navigation.

@@ -89,7 +89,20 @@
 (ert-deftest nextflow-ts-mode-fontify-string ()
   (nextflow-ts-test--with-fixture
    (should (eq (nextflow-ts-test--face-at "\"\"\"") 'font-lock-string-face))
-   (should (eq (nextflow-ts-test--face-at "echo Hello") 'font-lock-string-face))))
+   ;; With the bash grammar installed, script content is fontified as
+   ;; bash (echo is a builtin); otherwise it stays a plain string.
+   (should (memq (nextflow-ts-test--face-at "echo Hello")
+                 '(font-lock-string-face font-lock-builtin-face)))))
+
+(ert-deftest nextflow-ts-mode-bash-injection ()
+  "Script block content is fontified via the embedded bash parser."
+  (skip-unless (and (treesit-ready-p 'nextflow) (treesit-ready-p 'bash)))
+  (nextflow-ts-test--with-fixture
+   ;; `treesit-parser-list' accepts only 0-1 args in Emacs 29.
+   (should (memq 'bash (mapcar #'treesit-parser-language
+                               (treesit-parser-list))))
+   (should (eq (nextflow-ts-test--face-at "echo Hello")
+               'font-lock-builtin-face))))
 
 ;;; Indentation
 
