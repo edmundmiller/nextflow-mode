@@ -205,18 +205,25 @@
      :host 'nextflow
      ;; Capture only the string *content*, not the quote delimiters,
      ;; otherwise bash parses the surrounding quotes as a string.
+     ;; string_literal / triple_quoted_string are single tokens with
+     ;; no content child, so they are NOT injected: bash would receive
+     ;; the quote delimiters and parse the body as one quoted word.
      '((script_content
         (interpolated_triple_quoted_string
-         (triple_string_content) @capture)))))
+         (triple_string_content) @capture))
+       (script_content
+        (interpolated_string
+         (string_content) @capture)))))
   "Tree-sitter range rules injecting bash into process script blocks.")
 
 (defun nextflow-ts-mode--language-at-point (point)
   "Return the treesit language at POINT: `bash' in injected script content."
   (let ((node (treesit-node-at point 'nextflow)))
-    ;; Only triple-quoted script bodies are injected (must mirror
+    ;; Only interpolated script bodies are injected (must mirror
     ;; `nextflow-ts-mode--range-settings').
     (if (and node
-             (equal (treesit-node-type node) "triple_string_content")
+             (member (treesit-node-type node)
+                     '("triple_string_content" "string_content"))
              (treesit-parent-until
               node
               (lambda (n)

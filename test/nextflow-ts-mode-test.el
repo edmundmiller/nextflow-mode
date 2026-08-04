@@ -104,6 +104,22 @@
    (should (eq (nextflow-ts-test--face-at "echo Hello")
                'font-lock-builtin-face))))
 
+(ert-deftest nextflow-ts-mode-bash-injection-double-quoted ()
+  "Double-quoted script bodies are fontified via the embedded bash parser."
+  (skip-unless (and (treesit-ready-p 'nextflow) (treesit-ready-p 'bash)))
+  (with-temp-buffer
+    (insert "process FOO {\n"
+            "    script:\n"
+            "    \"echo hello\"\n"
+            "}\n")
+    (nextflow-ts-mode)
+    (font-lock-ensure)
+    ;; `treesit-parser-list' accepts only 0-1 args in Emacs 29.
+    (should (memq 'bash (mapcar #'treesit-parser-language
+                                (treesit-parser-list))))
+    (should (eq (nextflow-ts-test--face-at "echo hello")
+                'font-lock-builtin-face))))
+
 ;;; Indentation
 
 (ert-deftest nextflow-ts-mode-indent-process ()
