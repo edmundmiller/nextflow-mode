@@ -1,9 +1,22 @@
 #+TITLE: Emacs Nextflow Mode
 
-This is a basic mode for syntax highlighting for [[https://www.nextflow.io/][Nextflow]] based on [[https://git.kyleam.com/snakemake-mode/about/][snakemake-mode]]. More features such as a popup runner, and better script editing planned in the future! Support for DSL2 is in the works also.
+This is a mode for syntax highlighting for [[https://www.nextflow.io/][Nextflow]] based on [[https://git.kyleam.com/snakemake-mode/about/][snakemake-mode]]. More features such as a popup runner, and better script editing planned in the future! Support for DSL2 is in the works also.
+
+Two modes are provided:
+- =nextflow-ts-mode= — tree-sitter based mode for Emacs 29+ (recommended)
+- =nextflow-mode= — regex-based fallback for older Emacs, built on =groovy-mode=
+
+** Tree-sitter mode (Emacs 29+)
+=nextflow-ts-mode= uses the built-in =treesit= support with the [[https://github.com/nextflow-io/tree-sitter-nextflow][tree-sitter-nextflow]] grammar. Install the grammar once (requires a C compiler):
+
+#+BEGIN_SRC emacs-lisp
+M-x treesit-install-language-grammar RET nextflow RET
+#+END_SRC
+
+Loading =nextflow-ts-mode= registers the grammar source automatically. When the grammar is installed, buffers in =nextflow-mode= are remapped to =nextflow-ts-mode= via =major-mode-remap-alist=.
 
 ** Installation
-In order to use this package you'll need to install this packages first:
+In order to use the fallback =nextflow-mode= you'll need to install these packages first:
     - [[https://elpa.gnu.org/packages/cl-lib.html][cl-lib]] 
     - [[https://melpa.org/#/groovy-mode][groovy-mode]]
 

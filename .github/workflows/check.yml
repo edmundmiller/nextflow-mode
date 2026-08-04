@@ -22,7 +22,7 @@ jobs:
           - emacs_version: snapshot
             ignore_warnings: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: purcell/setup-emacs@master
         with:
           version: ${{ matrix.emacs_version }}
@@ -30,3 +30,31 @@ jobs:
         with:
           file: nextflow-mode.el
           ignore_warnings: ${{ matrix.ignore_warnings }}
+
+  check-ts:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        emacs_version:
+          - 29.4
+          - 30.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.emacs_version }}
+      - name: Byte-compile nextflow-ts-mode
+        run: emacs -Q --batch -f batch-byte-compile nextflow-ts-mode.el
+      - name: Install nextflow tree-sitter grammar
+        run: |
+          emacs -Q --batch --eval "(progn \
+            (require 'treesit) \
+            (add-to-list 'treesit-language-source-alist \
+                         '(nextflow \"https://github.com/nextflow-io/tree-sitter-nextflow\")) \
+            (treesit-install-language-grammar 'nextflow) \
+            (unless (treesit-ready-p 'nextflow) (kill-emacs 1)))"
+      - name: Run ERT tests
+        run: |
+          emacs -Q --batch -L . -l ert -l nextflow-ts-mode \
+            -l test/nextflow-ts-mode-test.el -f ert-run-tests-batch-and-exit
