@@ -106,7 +106,7 @@
 
 (ert-deftest nextflow-ts-mode-bash-injection-double-quoted ()
   "Double-quoted script bodies are fontified via the embedded bash parser."
-  (skip-unless (and (treesit-ready-p 'nextflow) (treesit-ready-p 'bash)))
+  (skip-unless (and (treesit-ready-p 'nextflow t) (treesit-ready-p 'bash t)))
   (with-temp-buffer
     (insert "process FOO {\n"
             "    script:\n"
