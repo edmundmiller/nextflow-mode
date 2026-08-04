@@ -5,7 +5,7 @@
 ;; Author: Edmund Miller <http://github/emiller88>
 ;; Maintainer: Edmund Miller <Edmund.A.Miller@gmail.com>
 ;; Created: August 04, 2025
-;; Version: 0.0.1
+;; Version: 1.0.0
 ;; Keywords: tools nextflow bioinformatics languages
 ;; Homepage: https://github.com/emiller88/nextflow-mode
 ;; Package-Requires: ((emacs "29.1"))

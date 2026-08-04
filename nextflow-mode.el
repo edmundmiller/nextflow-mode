@@ -6,7 +6,7 @@
 ;; Maintainer: Edmund Miller <Edmund.A.Miller@gmail.com>
 ;; Created: February 28, 2020
 ;; Modified: December 26, 2024
-;; Version: 0.0.1
+;; Version: 1.0.0
 ;; Keywords: tools nextflow bioinformatics
 ;; Homepage: https://github.com/emiller88/nextflow-mode
 ;; Package-Requires: ((emacs "24.5") (groovy-mode "2.1"))
