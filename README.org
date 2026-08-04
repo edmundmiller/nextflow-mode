@@ -27,3 +27,11 @@ use this snippet to install the package.
 #+BEGIN_SRC emacs-lisp
 (package! nextflow-mode :recipe (:host github :repo "emiller88/nextflow-mode"))
 #+END_SRC
+
+** Roadmap
+- [ ] Bash highlighting inside =script:= blocks via tree-sitter language injection (=script_content= nodes + an embedded bash parser)
+- [ ] Standalone =auto-mode-alist= entries for =nextflow-ts-mode= so it activates without =nextflow-mode=/groovy-mode installed
+- [ ] Validate highlighting against real nf-core modules; feed parse failures back to [[https://github.com/nextflow-io/tree-sitter-nextflow][tree-sitter-nextflow]]
+- [ ] Decide =nextflow.config= handling for the tree-sitter mode
+- [ ] Emacs 30 =treesit-thing-settings= (sexp/sentence navigation) and =which-func= integration
+- [ ] MELPA packaging
