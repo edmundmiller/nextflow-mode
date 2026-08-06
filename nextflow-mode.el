@@ -295,7 +295,16 @@ Returns an alist of name and position pairs for imenu navigation."
        #'nextflow-imenu-create-index)
   (set (make-local-variable 'font-lock-defaults)
        (cons nextflow-font-lock-keywords (cdr font-lock-defaults)))
-  (set (make-local-variable 'indent-line-function) #'nextflow-indent-line))
+  (set (make-local-variable 'indent-line-function) #'nextflow-indent-line)
+  (let ((shrt-buf  (file-name-nondirectory buffer-file-name)))
+    (setq-local compile-command
+		(concat "nextflow "
+			(shell-quote-argument shrt-buf))
+		compilation-buffer-name-function
+		(lambda (_mode)
+		  (concat "* Nextflowing " shrt-buf "*")))
+    )
+  )
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(?:nf\\)?patterns\\'" . nextflow-mode))
